@@ -1,4 +1,4 @@
-import "@/styles/globals.css";
+import "./globals.css";
 import Navbar from "@/components/Navbar";
 
 export default function RootLayout({
@@ -7,12 +7,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html>
+    <html lang="en">
       <body>
-        <div style={{ maxWidth: 420, margin: "0 auto" }}>
-          {children}
-          <Navbar />
-        </div>
+        <main className="app-shell">{children}</main>
+        <Navbar />
       </body>
     </html>
   );

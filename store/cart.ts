@@ -1,39 +1,60 @@
-import { create } from "zustand";
+import { useSyncExternalStore } from "react";
 import { Product } from "@/lib/types";
 
-type State = {
-  items: (Product & { qty: number })[];
-  add: (p: Product) => void;
-  remove: (id: string) => void;
-  clear: () => void;
-  total: () => number;
+type CartProduct = Product & { qty: number };
+
+type CartState = {
+  items: CartProduct[];
 };
 
-export const useCart = create<State>((set, get) => ({
-  items: [],
+const state: CartState = { items: [] };
+const listeners = new Set<() => void>();
 
-  add: (p) =>
-    set((state) => {
-      const exist = state.items.find((i) => i.id === p.id);
+function emit() {
+  listeners.forEach((listener) => listener());
+}
 
-      if (exist) {
-        return {
-          items: state.items.map((i) =>
-            i.id === p.id ? { ...i, qty: i.qty + 1 } : i
-          ),
-        };
-      }
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
 
-      return { items: [...state.items, { ...p, qty: 1 }] };
-    }),
+function getSnapshot() {
+  return state;
+}
 
-  remove: (id) =>
-    set((state) => ({
-      items: state.items.filter((i) => i.id !== id),
-    })),
+export function useCart() {
+  const snapshot = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
-  clear: () => set({ items: [] }),
+  const add = (p: Product) => {
+    const exist = state.items.find((i) => i.id === p.id);
+    if (exist) {
+      state.items = state.items.map((i) =>
+        i.id === p.id ? { ...i, qty: i.qty + 1 } : i
+      );
+    } else {
+      state.items = [...state.items, { ...p, qty: 1 }];
+    }
+    emit();
+  };
 
-  total: () =>
-    get().items.reduce((a, b) => a + b.price * b.qty, 0),
-}));
+  const remove = (id: string) => {
+    state.items = state.items.filter((i) => i.id !== id);
+    emit();
+  };
+
+  const clear = () => {
+    state.items = [];
+    emit();
+  };
+
+  const total = () => state.items.reduce((a, b) => a + b.price * b.qty, 0);
+
+  return {
+    items: snapshot.items,
+    add,
+    remove,
+    clear,
+    total,
+  };
+}

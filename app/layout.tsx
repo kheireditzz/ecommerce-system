@@ -1,28 +1,15 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-import Navbar from '@/components/Navbar'
+import "./globals.css";
+import Navbar from "@/components/Navbar";
 
-const inter = Inter({ subsets: ['latin'] })
-
-export const metadata: Metadata = {
-  title: 'ShopHub - E-Commerce System',
-  description: 'Modern e-commerce platform with Next.js and Supabase',
-}
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: any) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <Navbar />
-        <main className="container mx-auto px-4 py-8">
+    <html>
+      <body>
+        <div className="max-w-md mx-auto min-h-screen">
           {children}
-        </main>
+          <Navbar />
+        </div>
       </body>
     </html>
-  )
+  );
 }

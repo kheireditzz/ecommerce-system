@@ -1,24 +1,21 @@
 import Link from "next/link";
 
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/products", label: "Products" },
+  { href: "/cart", label: "Cart" },
+  { href: "/history", label: "History" },
+  { href: "/admin/products", label: "Admin" },
+];
+
 export default function Navbar() {
   return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: 10,
-        left: 0,
-        right: 0,
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
-      <div style={{ background: "#111", padding: 10, borderRadius: 20 }}>
-        <Link href="/">Home</Link> |{" "}
-        <Link href="/products">Products</Link> |{" "}
-        <Link href="/cart">Cart</Link> |{" "}
-        <Link href="/history">History</Link> |{" "}
-        <Link href="/admin/products">Admin</Link>
-      </div>
-    </div>
+    <nav className="bottom-nav glass">
+      {links.map((link) => (
+        <Link key={link.href} href={link.href} className="nav-link">
+          {link.label}
+        </Link>
+      ))}
+    </nav>
   );
 }

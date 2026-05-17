@@ -1,24 +1,47 @@
-import { supabase } from "@/lib/supabase";
+import { getOrders, supabase } from "@/lib/supabase";
+import OrderItem from "@/components/History/OrderItem";
 
 export default async function HistoryPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data } = await supabase
-    .from("orders")
-    .select("*")
-    .eq("user_id", user?.id);
+  if (!user) {
+    return (
+      <div style={{ padding: 10 }}>
+        <h2>History</h2>
+        <p>Silakan login untuk melihat riwayat pesanan.</p>
+      </div>
+    );
+  }
+
+  const { data, error } = await getOrders(user.id);
 
   return (
     <div style={{ padding: 10 }}>
       <h2>History</h2>
-
+      {error && <p>Gagal memuat history: {error.message}</p>}
+      {!data?.length && !error && <p>Belum ada pesanan.</p>}
       {data?.map((o: any) => (
-        <div key={o.id} style={{ border: "1px solid #333", margin: 10 }}>
-          <p>ID: {o.id}</p>
-          <p>Total: ${o.total}</p>
-        </div>
+        <OrderItem
+          key={o.id}
+          order={{
+            id: o.id,
+            created_at: o.created_at,
+            status: o.status,
+            quantity: o.quantity,
+            total_price: Number(o.total_price),
+            product: o.product
+              ? {
+                  id: o.product.id,
+                  name: o.product.name,
+                  description: o.product.description,
+                  price: Number(o.product.price),
+                  image: o.product.image_url || "",
+                }
+              : null,
+          }}
+        />
       ))}
     </div>
   );

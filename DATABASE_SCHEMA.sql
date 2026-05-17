@@ -52,6 +52,9 @@ alter table orders enable row level security;
 alter table products enable row level security;
 
 -- Policies for users table
+-- Backward-compatibility: drop old Indonesian policy names if they exist.
+drop policy if exists "Pengguna dapat melihat data mereka sendiri" on users;
+drop policy if exists "Pengguna dapat mengubah data mereka sendiri" on users;
 drop policy if exists "Users can view their own data" on users;
 create policy "Users can view their own data" on users
   for select using (auth.uid() = id);
@@ -61,6 +64,10 @@ create policy "Users can update their own data" on users
   for update using (auth.uid() = id);
 
 -- Policies for products table
+drop policy if exists "Produk dapat dibaca semua pengguna" on products;
+drop policy if exists "Hanya admin dapat menambah produk" on products;
+drop policy if exists "Hanya admin dapat mengubah produk" on products;
+drop policy if exists "Hanya admin dapat menghapus produk" on products;
 drop policy if exists "Products are readable by all" on products;
 create policy "Products are readable by all" on products
   for select using (true);
@@ -84,6 +91,10 @@ create policy "Only admins can delete products" on products
   );
 
 -- Policies for cart table
+drop policy if exists "Pengguna dapat melihat cart mereka sendiri" on cart;
+drop policy if exists "Pengguna dapat menambah cart mereka sendiri" on cart;
+drop policy if exists "Pengguna dapat mengubah cart mereka sendiri" on cart;
+drop policy if exists "Pengguna dapat menghapus cart mereka sendiri" on cart;
 drop policy if exists "Users can view their own cart" on cart;
 create policy "Users can view their own cart" on cart
   for select using (auth.uid() = user_id);
@@ -101,6 +112,9 @@ create policy "Users can delete from their cart" on cart
   for delete using (auth.uid() = user_id);
 
 -- Policies for orders table
+drop policy if exists "Pengguna dapat melihat order mereka sendiri" on orders;
+drop policy if exists "Pengguna dapat menambah order" on orders;
+drop policy if exists "Pengguna dapat mengubah order mereka sendiri" on orders;
 drop policy if exists "Users can view their own orders" on orders;
 create policy "Users can view their own orders" on orders
   for select using (auth.uid() = user_id);
